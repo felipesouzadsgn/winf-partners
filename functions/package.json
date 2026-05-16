@@ -1,0 +1,21 @@
+{
+  "name": "winf-os-functions",
+  "version": "1.0.0",
+  "description": "WINF.OS™ Zero-Trust Cloud Functions",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.11.0",
+    "firebase-functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

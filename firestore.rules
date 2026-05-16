@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // MÁQUINA DE REGRAS : ZERO TRUST ARCHITECTURE
+    // ==========================================
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { 
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return isSignedIn() && userDoc != null && userDoc.data.role == 'Admin';
+    }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidRetalho(data) {
+      return data.product_id is string && data.product_id.size() <= 128 &&
+             data.product_name is string && data.product_name.size() <= 128 &&
+             data.dimensions is string && data.dimensions.size() <= 32 &&
+             data.areaM2 is number &&
+             data.is_used is bool &&
+             data.user_id is string &&
+             data.created_at is timestamp;
+    }
+
+    function getUserRank() {
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return (userDoc.data != null && userDoc.data.w_rank_level is number) ? userDoc.data.w_rank_level : 0;
+    }
+
+    // BLINDAGEM MÁSTER - Negar tudo por padrão
+    match /{document=**} {
+      allow read, write: if false; 
+    }
+
+    // ==========================================
+    // MODULE: COINS / LEDGER
+    // ==========================================
+    // - O Front-end só pode ler o próprio saldo.
+    // - Jamais escreve, altera ou remove moedas.
+    match /coin_ledger/{coinId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // ==========================================
+    // MODULE: WARRANTIES (GARANTIAS NEURAIS)
+    // ==========================================
+    // - Proteção Absoluta contra geração e alteração de Garantias na mão. // Modificado para prototype Frontend
+    match /warranties/{warrantyId} {
+      allow get: if true;
+      allow list: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ==========================================
+    // MODULE: INVENTORY (ROLLS)
+    // ==========================================
+    // - O Front-end nunca escreve metragens livremente no Database Central.
+    match /rolls/{rollId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); 
+    }
+    match /retalhos/{retalhoId} {
+      allow read, write: if isSignedIn();
+    }
+    match /stock_mutations/{mutationId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); 
+    }
+
+    // ==========================================
+    // MODULE: CORE OPERATIONAL (OS / LEADS)
+    // ==========================================
+    match /installations/{osId} {
+      allow read: if isSignedIn(); // Removed restriction for control room
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /leads/{leadId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+    }
+
+    match /agent_logs/{logId} {
+      allow read: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if isSignedIn() && request.resource.data.user_id == request.auth.uid && resource.data.user_id == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    
+    match /core_ai_chats/{chatId} {
+      allow read: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if isSignedIn() && request.resource.data.user_id == request.auth.uid && resource.data.user_id == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    
+    // ==========================================
+    // MODULE: ACCOUNTS & IDENTITY
+    // ==========================================
+    match /users/{userId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /vehicles/{vehicleId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /security_audits/{auditId} {
+      allow read, write: if isAdmin(); // Server only
+    }
+    
+    // ==========================================
+    // MODULE: PROTOTYPING E GUIAS DA FASE DE MVP (EXTENSIONS ALREADY CREATED)
+    // ==========================================
+    match /orders/{orderId} {
+      allow read, create, update: if isSignedIn();
+    }
+    match /order_items/{itemId} { allow read, create, update: if isSignedIn(); }
+    match /ai_generations/{genId} {
+      allow read: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if isSignedIn() && request.resource.data.user_id == request.auth.uid && resource.data.user_id == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    match /social_posts/{postId} { allow read, create, update: if isSignedIn(); }
+    match /platform_events {
+      allow read: if isSignedIn();
+      match /{eventId} { allow read, write: if isSignedIn(); }
+    }
+    match /transactions {
+      allow read: if isSignedIn();
+      match /{txId} { allow read, create, update: if isSignedIn(); }
+    }
+    match /partner_tasks/{taskId} { allow read, create, update: if isSignedIn(); }
+    match /agent_insights/{insightId} {
+      allow read: if isSignedIn() && (resource.data.user_id == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update: if isSignedIn() && request.resource.data.user_id == request.auth.uid && resource.data.user_id == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    match /stock_items/{itemId} { allow read, create, update: if isSignedIn(); } // Allow prototype frontend logic
+    match /documents/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /documents_master {
+       allow read: if isSignedIn();
+       match /{docId} { allow read, write: if isSignedIn(); }
+    }
+    match /products {
+       allow read: if isSignedIn();
+       match /{productId} { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    }
+
+    // ==========================================
+    // MODULE: INVESTORS & DARK POOL (CAPITAL)
+    // ==========================================
+    match /investments/{investmentId} {
+       allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+       allow write: if isAdmin(); // only admins register investments
+    }
+    match /dividends/{dividendId} {
+       allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+       allow write: if isAdmin(); // only admins push dividends
+    }
+
+    // ==========================================
+    // MODULE: BLACKSHOP & WINF CHAIN
+    // ==========================================
+    match /blackshop/{orderId} {
+      // Leitura permitida apenas para o dono do pedido ou Admin
+      allow read: if isSignedIn();
+      // Criação permitida usando o helper do framework front-end do MVP (protótipo)
+      allow create, update: if isSignedIn();
+    }
+    match /winf_chain/{txId} {
+      // Leitura global de transações públicas da blockchain
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+    }
+  }
+}

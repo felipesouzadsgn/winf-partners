@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-heading: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-winf-background: var(--winf-background);
+  --color-winf-surface: var(--winf-surface);
+  --color-winf-surface_hover: var(--winf-surface-hover);
+  --color-winf-border: var(--winf-border);
+  --color-winf-primary: #ffffff;
+  --color-winf-primary_hover: #f4f4f5;
+  --color-winf-text_primary: var(--winf-text-primary);
+  --color-winf-text_secondary: var(--winf-text-secondary);
+  --color-winf-text_muted: var(--winf-text-muted);
+  --color-winf-accent: #a1a1aa;
+
+  --animate-scan: scan 3s linear infinite;
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(1000%); opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@utility text-shadow-glow {
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+@utility text-shadow-white {
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+@layer base {
+  :root {
+    --winf-background: #09090b;
+    --winf-surface: #18181b;
+    --winf-surface-hover: #27272a;
+    --winf-border: #27272a;
+    --winf-primary: #ffffff;
+    --winf-primary-hover: #f4f4f5;
+    --winf-text-primary: #fafafa;
+    --winf-text-secondary: #d4d4d8;
+    --winf-text-muted: #e4e4e7;
+    --winf-accent: #a1a1aa;
+    --winf-primary-rgb: 255, 255, 255;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-winf-background text-winf-text_primary font-sans antialiased;
+    background-image: radial-gradient(circle at 1px 1px, rgba(128, 128, 128, 0.05) 1px, transparent 0);
+    background-size: 50px 50px;
+  }
+  ::selection {
+    @apply bg-winf-primary text-winf-background;
+  }
+}
+
+/* Datepicker Overrides */
+.react-datepicker {
+  @apply !bg-[#0a0a0a] !border !border-white/10 !rounded-2xl !font-sans !text-white !shadow-2xl;
+}
+
+.react-datepicker__header {
+  @apply !bg-[#0a0a0a] !border-b !border-white/10 !rounded-t-2xl !pt-4;
+}
+
+.react-datepicker__current-month, 
+.react-datepicker__day-name {
+  @apply !text-white/60 !font-bold !uppercase !tracking-widest !text-[10px];
+}
+
+.react-datepicker__day {
+  @apply !text-white/80 hover:!bg-winf-primary hover:!text-black !rounded-lg !transition-all;
+}
+
+.react-datepicker__day--selected {
+  @apply !bg-winf-primary !text-black !font-bold;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply !bg-white/10 !text-white;
+}
+
+.react-datepicker__day--outside-month {
+  @apply !text-white/20;
+}
+
+.react-datepicker__navigation {
+  @apply !top-4;
+}
+
+.react-datepicker__triangle {
+  @apply !hidden;
+}
+
+/* Elite Design Utilities */
+.scanline-overlay {
+  position: relative;
+}
+
+.scanline-overlay::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  opacity: 0.1;
+}
+
+.scanline-overlay-line {
+  width: 100%;
+  height: 100px;
+  z-index: 3;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(0, 0, 0, 0) 100%);
+  opacity: 0.1;
+  position: absolute;
+  bottom: 100%;
+  animation: scanline 10s linear infinite;
+}
+
+@keyframes scanline {
+  0% { bottom: 100%; }
+  80% { bottom: 100%; }
+  100% { bottom: -100px; }
+}
+
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+  animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+  5% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.13deg); }
+  10% { clip: rect(90px, 9999px, 98px, 0); transform: skew(0.36deg); }
+  15% { clip: rect(10px, 9999px, 14px, 0); transform: skew(0.24deg); }
+  20% { clip: rect(58px, 9999px, 55px, 0); transform: skew(0.48deg); }
+  25% { clip: rect(10px, 9999px, 14px, 0); transform: skew(0.24deg); }
+  30% { clip: rect(90px, 9999px, 98px, 0); transform: skew(0.36deg); }
+  35% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.13deg); }
+  40% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+  45% { clip: rect(58px, 9999px, 55px, 0); transform: skew(0.48deg); }
+  50% { clip: rect(10px, 9999px, 14px, 0); transform: skew(0.24deg); }
+  55% { clip: rect(90px, 9999px, 98px, 0); transform: skew(0.36deg); }
+  60% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.13deg); }
+  65% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+  70% { clip: rect(58px, 9999px, 55px, 0); transform: skew(0.48deg); }
+  75% { clip: rect(10px, 9999px, 14px, 0); transform: skew(0.24deg); }
+  80% { clip: rect(90px, 9999px, 98px, 0); transform: skew(0.36deg); }
+  85% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.13deg); }
+  90% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+  95% { clip: rect(58px, 9999px, 55px, 0); transform: skew(0.48deg); }
+  100% { clip: rect(10px, 9999px, 14px, 0); transform: skew(0.24deg); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.15deg); }
+  5% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.55deg); }
+  10% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.35deg); }
+  15% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.25deg); }
+  20% { clip: rect(67px, 9999px, 61px, 0); transform: skew(0.45deg); }
+  25% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.25deg); }
+  30% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.35deg); }
+  35% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.55deg); }
+  40% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.15deg); }
+  45% { clip: rect(67px, 9999px, 61px, 0); transform: skew(0.45deg); }
+  50% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.25deg); }
+  55% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.35deg); }
+  60% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.55deg); }
+  65% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.15deg); }
+  70% { clip: rect(67px, 9999px, 61px, 0); transform: skew(0.45deg); }
+  75% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.25deg); }
+  80% { clip: rect(79px, 9999px, 85px, 0); transform: skew(0.35deg); }
+  85% { clip: rect(52px, 9999px, 74px, 0); transform: skew(0.55deg); }
+  90% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.15deg); }
+  95% { clip: rect(67px, 9999px, 61px, 0); transform: skew(0.45deg); }
+  100% { clip: rect(75px, 9999px, 5px, 0); transform: skew(0.25deg); }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

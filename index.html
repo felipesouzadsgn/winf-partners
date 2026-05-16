@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Winf Digital Ecosystem</title>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX', { send_page_view: false });
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      body { background-color: #09090b; color: #fafafa; -webkit-font-smoothing: antialiased; }
+      
+      /* Scrollbar Invisível mas funcional para toque */
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+      
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      /* Otimizações Mobile */
+      input, select, textarea { font-size: 16px !important; } /* Previne zoom no iOS */
+
+      .scanline-overlay { position: relative; overflow: hidden; }
+      .scanline-overlay::after {
+        content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+        background-size: 100% 4px; pointer-events: none; z-index: 10;
+      }
+      .scanline-overlay-line {
+        position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+        background: rgba(255, 255, 255, 0.1); animation: scanline 4s linear infinite;
+        pointer-events: none; z-index: 11;
+      }
+    </style>
+  </head>
+  <body class="antialiased selection:bg-winf-primary/30 selection:text-white">
+    <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
